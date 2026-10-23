@@ -5,7 +5,7 @@ All notable changes to this skill. Format follows [Keep a Changelog](https://kee
 ## [Unreleased]
 
 ### Added
-- A pipeline picture in the README (`assets/pipeline.png`), generated with GPT Image 2.5 Sunburst. The skill itself is unchanged.
+- A pipeline picture in the README (`assets/pipeline.jpg`), generated with GPT Image 2.5 Sunburst. The skill itself is unchanged.
 
 ## [1.1.0] - 2026-10-23
 
