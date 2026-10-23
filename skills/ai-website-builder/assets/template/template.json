@@ -1,0 +1,9 @@
+{
+  "id": "atelier-vite",
+  "name": "Atelier (Vite)",
+  "description": "Static marketing app starter: Vite, React 19, strict TypeScript, Tailwind v4 driven by the design-token contract, 18 token-only UI primitives, layout primitives, per-route prerender with SEO, and the platform AI rail client.",
+  "stack": ["vite", "react", "typescript", "tailwindcss", "react-router", "radix-ui", "lucide-react", "@fal-ai/client"],
+  "entryRoutes": ["/"],
+  "tokenContract": 1,
+  "cacheDir": ".cache"
+}

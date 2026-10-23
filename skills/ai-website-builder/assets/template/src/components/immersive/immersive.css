@@ -1,0 +1,446 @@
+/*
+ * The immersive kit's styles (components/immersive). Imported by the components themselves, so an app that does not use the kit does
+ * not ship a byte of this. Tokens only: colours, radii and motion come from var(--color-*), var(--radius-*), var(--duration-*),
+ * var(--ease-*); type families come from the Tailwind classes in the components. Block-axis movement and logical properties, so
+ * right-to-left needs nothing. Everything that moves is off under prefers-reduced-motion.
+ */
+
+/* ---- shared ------------------------------------------------------------------------------------------------------------------------ */
+
+.ik-fill {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.ik-canvas {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  display: block;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.ik-canvas[data-shown="true"] {
+  opacity: 1;
+}
+
+.ik-overlay {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- runway: a tall section, a pinned stage, beats ------------------------------------------------------------------------------- */
+
+/* The static layout is the default (server render, no JavaScript, reduced motion, Save-Data): the poster is the first screen, the beats
+   are ordinary blocks below it. The runway keeps its full height from the first paint so nothing shifts when the pinned layout starts. */
+.ik-runway {
+  position: relative;
+  min-block-size: calc(var(--runway, 5) * 100vh);
+  min-block-size: calc(var(--runway, 5) * 100svh);
+}
+
+.ik-runway[data-runway-compact] {
+  min-block-size: 0;
+}
+
+.ik-stage {
+  position: relative;
+  background: var(--color-bg);
+}
+
+.ik-media {
+  position: relative;
+  block-size: 100vh;
+  block-size: 100svh;
+  overflow: hidden;
+  background: var(--color-surface-2);
+}
+
+.ik-beats {
+  position: relative;
+  background: var(--color-bg);
+  color: var(--color-fg);
+}
+
+.ik-beat {
+  max-inline-size: 42rem;
+  margin-inline: auto;
+  padding-block: var(--spacing-section);
+  padding-inline: 1.5rem;
+}
+
+/* Pinned layout: native scroll through the runway while the stage stays on screen. */
+.ik-runway[data-runway-state="live"] .ik-stage {
+  position: sticky;
+  inset-block-start: 0;
+  block-size: 100vh;
+  block-size: 100svh;
+  overflow: clip;
+}
+
+.ik-runway[data-runway-state="live"] .ik-media {
+  position: absolute;
+  inset: 0;
+  block-size: auto;
+}
+
+.ik-runway[data-runway-state="live"] .ik-beats {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  background: transparent;
+  pointer-events: none;
+}
+
+.ik-runway[data-runway-state="live"] .ik-beat {
+  grid-area: 1 / 1;
+  align-self: center;
+  inline-size: min(36rem, 90%);
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklab, var(--color-bg) 82%, transparent);
+  opacity: 0;
+  translate: 0 0.75rem;
+  pointer-events: none;
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    translate var(--duration-base) var(--ease-out);
+}
+
+.ik-runway[data-runway-state="live"] .ik-beat[data-beat-state="active"] {
+  opacity: 1;
+  translate: 0 0;
+  pointer-events: auto;
+}
+
+.ik-runway[data-runway-state="live"] .ik-beat[data-beat-state="after"] {
+  translate: 0 -0.75rem;
+}
+
+/* A beat that has focus inside it is always readable, even while the runway catches up. */
+.ik-runway[data-runway-state="live"] .ik-beat:focus-within {
+  opacity: 1;
+  translate: 0 0;
+  pointer-events: auto;
+}
+
+/* ---- chapter markers --------------------------------------------------------------------------------------------------------------- */
+
+.ik-chapters ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ik-chapters a {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--color-bg) 78%, transparent);
+  color: var(--color-fg);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.ik-chapters a[aria-current="true"] {
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+  border-color: var(--color-accent);
+}
+
+.ik-runway[data-runway-state="live"] .ik-chapters {
+  grid-area: 1 / 1;
+  align-self: end;
+  justify-self: center;
+  padding-block-end: 1.5rem;
+  pointer-events: auto;
+}
+
+/* ---- preloader ------------------------------------------------------------------------------------------------------------------------ */
+
+.ik-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  /* If JavaScript never releases the curtain (a script that failed to load), it fades out by itself and is clipped away, so it neither shows nor blocks a click.
+     (Opacity and clip-path, not visibility: Chrome can leave a finished animation a hair short of its last keyframe, and a discrete property then never flips.) */
+  animation: ik-curtain-failsafe 0.6s linear 14s forwards;
+}
+
+.ik-preloader[data-preloader="done"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  animation: none;
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    visibility 0s linear var(--duration-base);
+}
+
+@keyframes ik-curtain-failsafe {
+  to {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+html[data-loading] {
+  overflow: hidden;
+}
+
+.ik-preloader-inner {
+  display: grid;
+  gap: 0.75rem;
+  inline-size: min(26rem, 80vw);
+}
+
+.ik-preloader-line {
+  block-size: 2px;
+  background: var(--color-line);
+  overflow: hidden;
+}
+
+.ik-preloader-line > span {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  background: var(--color-accent);
+  transform-origin: 0 50%;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+[dir="rtl"] .ik-preloader-line > span {
+  transform-origin: 100% 50%;
+}
+
+.ik-preloader-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0;
+}
+
+.ik-preloader-skip {
+  justify-self: start;
+  cursor: pointer;
+}
+
+/* ---- looping video and shader hero ----------------------------------------------------------------------------------------------- */
+
+.ik-loop {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-surface-2);
+}
+
+.ik-loop-fill {
+  position: absolute;
+  inset: 0;
+}
+
+.ik-loop > .ik-overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.ik-hero {
+  position: relative;
+  min-block-size: 100vh;
+  min-block-size: 100svh;
+  display: grid;
+  overflow: hidden;
+  background: var(--color-surface-2);
+}
+
+.ik-hero > .ik-media {
+  position: absolute;
+  inset: 0;
+  block-size: auto;
+}
+
+.ik-hero > .ik-overlay {
+  grid-area: 1 / 1;
+  align-self: center;
+}
+
+/* ---- cut-outs ---------------------------------------------------------------------------------------------------------------------- */
+
+.ik-cutout {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ik-cutout[data-edge="end"] {
+  inset-block-end: 0;
+  translate: 0 50%;
+}
+
+.ik-cutout[data-edge="start"] {
+  inset-block-start: 0;
+  translate: 0 -50%;
+}
+
+.ik-cutout .ik-cutout-img {
+  background: transparent;
+  overflow: visible;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ik-cutout[data-cutout-live] {
+    transform: translate3d(
+      calc(var(--ik-px, 0) * var(--ik-depth, 0.5) * -1.5rem),
+      calc(var(--ik-py, 0) * var(--ik-depth, 0.5) * -1rem + var(--ik-sy, 0) * var(--ik-depth, 0.5) * -5rem),
+      0
+    );
+    transition: transform var(--duration-slow) var(--ease-spring);
+    will-change: transform;
+  }
+}
+
+/* ---- mascot ---------------------------------------------------------------------------------------------------------------------- */
+
+.ik-mascot {
+  position: relative;
+  display: inline-block;
+  inline-size: min(100%, 22rem);
+}
+
+.ik-mascot svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+.ik-mascot .ik-mascot-pose {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-mascot-live] [data-motion] {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  [data-mascot-live] [data-motion="blink"] {
+    animation: ik-blink 5s var(--ease-in-out) infinite;
+  }
+  [data-mascot-live] [data-motion="bob"] {
+    animation: ik-bob 4s var(--ease-in-out) infinite;
+  }
+  [data-mascot-live] [data-motion="breathe"] {
+    animation: ik-breathe 5s var(--ease-in-out) infinite;
+  }
+  [data-mascot-live] [data-motion="sway"] {
+    animation: ik-sway 6s var(--ease-in-out) infinite;
+  }
+  [data-mascot-live] [data-motion="wave"] {
+    transform-origin: 50% 100%;
+    animation: ik-wave 6s var(--ease-in-out) infinite;
+  }
+  [data-mascot-live] [data-motion="wag"] {
+    transform-origin: 0 50%;
+    animation: ik-wag 1.6s var(--ease-in-out) infinite;
+  }
+  [data-mascot-live][data-in-view="false"] [data-motion] {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes ik-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.08);
+  }
+}
+
+@keyframes ik-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3%);
+  }
+}
+
+@keyframes ik-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.025);
+  }
+}
+
+@keyframes ik-sway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes ik-wave {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0deg);
+  }
+  68% {
+    transform: rotate(14deg);
+  }
+  76% {
+    transform: rotate(-8deg);
+  }
+  84% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes ik-wag {
+  0%,
+  100% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+}
+
+/* ---- reduced motion -------------------------------------------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  /* The pinned layout never starts, so the runway needs no extra height; the curtain is not shown at all. */
+  .ik-runway {
+    min-block-size: 0;
+  }
+  .ik-preloader {
+    display: none;
+  }
+  .ik-canvas {
+    transition: none;
+  }
+}

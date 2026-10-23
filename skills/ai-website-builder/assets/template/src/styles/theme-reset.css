@@ -1,0 +1,13 @@
+/*
+ * Platform-owned. Clears Tailwind's default palette, font stacks, type scale, radii and shadows so the ONLY
+ * ones that exist are the names defined in tokens.css. A class like bg-zinc-500, text-red-600, font-serif,
+ * rounded-3xl or shadow-2xl therefore generates no CSS at all. Imported by index.css before tokens.css.
+ * Spacing, breakpoints, easing and the other defaults are intentionally kept.
+ */
+@theme {
+  --color-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+}

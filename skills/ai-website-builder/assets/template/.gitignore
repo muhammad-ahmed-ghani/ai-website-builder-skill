@@ -1,0 +1,22 @@
+# deps and build output
+node_modules/
+dist/
+.ssr/
+.vite/
+*.tsbuildinfo
+
+# dependency cache used to seed sandboxes (see ../scripts/prepare-cache.ts)
+.cache/
+
+# secrets: the manifest lives in .env.example
+.env
+.env.*
+!.env.example
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/
+
+# the QA pictures and recordings (rebuilt every run)
+.app-notes/qa/

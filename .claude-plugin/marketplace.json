@@ -1,0 +1,16 @@
+{
+  "name": "ai-website-builder-marketplace",
+  "owner": { "name": "Muhammad Ahmed Ghani" },
+  "metadata": {
+    "description": "AI Website Builder: an agent skill that builds web apps that are designed, honest and verified instead of templated."
+  },
+  "plugins": [
+    {
+      "name": "ai-website-builder",
+      "description": "Builds a web app from a request: reads what the person really wants, chooses the look from six-direction inspiration boards, builds from a token-driven starter, and verifies the result in a real browser.",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/ai-website-builder"]
+    }
+  ]
+}

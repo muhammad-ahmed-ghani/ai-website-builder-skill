@@ -1,0 +1,3 @@
+# Makes this directory its own pnpm workspace root. Without it, a project that lives inside another repository
+# (the local sandbox does) is adopted by the parent repo's workspace and pnpm refuses to install against the parent's store.
+packages: []

@@ -1,0 +1,3 @@
+# Dev fallback. `pnpm build` regenerates dist/robots.txt (and sitemap.xml) from src/routes.tsx.
+User-agent: *
+Allow: /

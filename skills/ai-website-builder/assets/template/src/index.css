@@ -1,0 +1,274 @@
+@import "tailwindcss" source(none);
+@import "./styles/theme-reset.css";
+@import "./styles/fonts.css";
+@import "./styles/tokens.css";
+
+/* Only scan source files for class names: notes, docs and AGENTS.md mention forbidden classes on purpose. */
+@source "./";
+@source "../index.html";
+
+/*
+ * Base styles. Deliberately plain: no gradients, no decorative backgrounds, no custom scrollbars.
+ * Everything visual comes from tokens.css. Do not add colours, fonts or radii here.
+ */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* keeps in-page anchors clear of a sticky header */
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  html[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-bg font-sans text-base text-fg antialiased;
+    min-height: 100dvh;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-accent-fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/*
+ * Enter/exit animations for overlays (dialog, sheet, popover, tooltip, select, toast).
+ * They only use the motion tokens, so a new direction retimes them for free.
+ */
+@theme {
+  --animate-fade-in: fade-in var(--duration-base) var(--ease-out) both;
+  --animate-fade-out: fade-out var(--duration-fast) var(--ease-out) both;
+  --animate-pop-in: pop-in var(--duration-base) var(--ease-out) both;
+  --animate-pop-out: pop-out var(--duration-fast) var(--ease-out) both;
+  --animate-slide-in-right: slide-in-right var(--duration-base) var(--ease-out) both;
+  --animate-slide-out-right: slide-out-right var(--duration-fast) var(--ease-out) both;
+  --animate-slide-in-left: slide-in-left var(--duration-base) var(--ease-out) both;
+  --animate-slide-out-left: slide-out-left var(--duration-fast) var(--ease-out) both;
+  --animate-slide-in-top: slide-in-top var(--duration-base) var(--ease-out) both;
+  --animate-slide-out-top: slide-out-top var(--duration-fast) var(--ease-out) both;
+  --animate-slide-in-bottom: slide-in-bottom var(--duration-base) var(--ease-out) both;
+  --animate-slide-out-bottom: slide-out-bottom var(--duration-fast) var(--ease-out) both;
+  --animate-accordion-down: accordion-down var(--duration-base) var(--ease-out);
+  --animate-accordion-up: accordion-up var(--duration-base) var(--ease-out);
+  --animate-indeterminate: indeterminate 1.4s var(--ease-in-out) infinite;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes pop-out {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.96); }
+  }
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+  @keyframes slide-out-right {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
+  }
+  @keyframes slide-in-left {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+  }
+  @keyframes slide-out-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+  @keyframes slide-in-top {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+  }
+  @keyframes slide-out-top {
+    from { transform: translateY(0); }
+    to { transform: translateY(-100%); }
+  }
+  @keyframes slide-in-bottom {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  @keyframes slide-out-bottom {
+    from { transform: translateY(0); }
+    to { transform: translateY(100%); }
+  }
+  @keyframes accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
+  }
+  @keyframes indeterminate {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(300%); }
+  }
+}
+
+/*
+ * Scroll reveal (see components/core/Reveal.tsx). Content is visible by default; the Reveal component
+ * sets data-reveal-state="hidden" only after hydration, only for elements below the fold, and never
+ * under prefers-reduced-motion. If JavaScript fails, nothing is ever hidden.
+ */
+[data-reveal] {
+  transition:
+    opacity var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-out);
+}
+
+[data-reveal][data-reveal-state="hidden"] {
+  opacity: 0;
+  transform: translateY(0.75rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal][data-reveal-state="hidden"] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * Motion recipes (components/motion, components/core/Reveal, components/core/Link). Every one uses the motion tokens
+ * (--duration-fast|base|slow, --ease-out), only moves along the block axis or fades (so right-to-left needs nothing), shows its
+ * content fully before hydration, and is off under prefers-reduced-motion.
+ */
+
+/* reveal: variants. `fade` does not move; `clip` unmasks from the top edge (headlines). */
+[data-reveal][data-reveal-variant="fade"][data-reveal-state="hidden"] {
+  transform: none;
+}
+
+[data-reveal][data-reveal-variant="clip"] {
+  transition: clip-path var(--duration-slow) var(--ease-out);
+}
+
+[data-reveal][data-reveal-variant="clip"][data-reveal-state="hidden"] {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 0 100% 0);
+}
+
+[data-reveal][data-reveal-variant="clip"][data-reveal-state="shown"] {
+  clip-path: inset(0);
+}
+
+/* stagger: children of [data-stagger] arrive one after another (index set by position, up to 12). */
+[data-stagger] > * {
+  transition:
+    opacity var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-out);
+  transition-delay: calc(var(--i, 12) * var(--stagger-step, 60ms));
+}
+
+[data-stagger] > :nth-child(1) { --i: 0; }
+[data-stagger] > :nth-child(2) { --i: 1; }
+[data-stagger] > :nth-child(3) { --i: 2; }
+[data-stagger] > :nth-child(4) { --i: 3; }
+[data-stagger] > :nth-child(5) { --i: 4; }
+[data-stagger] > :nth-child(6) { --i: 5; }
+[data-stagger] > :nth-child(7) { --i: 6; }
+[data-stagger] > :nth-child(8) { --i: 7; }
+[data-stagger] > :nth-child(9) { --i: 8; }
+[data-stagger] > :nth-child(10) { --i: 9; }
+[data-stagger] > :nth-child(11) { --i: 10; }
+[data-stagger] > :nth-child(n + 12) { --i: 11; }
+
+[data-stagger][data-stagger-state="hidden"] > * {
+  opacity: 0;
+  transform: translateY(0.75rem);
+}
+
+/* ticker: static list by default; stacked cross-fade once the component is active. */
+[data-ticker="static"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+}
+
+[data-ticker="active"] {
+  display: grid;
+}
+
+[data-ticker="active"] > li {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+[data-ticker="active"] > li[data-active] {
+  opacity: 1;
+}
+
+/* lift: hover and keyboard focus raise a card or row a little. Pointer devices only. */
+@utility lift {
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    &:hover,
+    &:focus-visible {
+      transform: translateY(-0.25rem);
+      box-shadow: var(--shadow-md);
+    }
+  }
+}
+
+/* view transitions: real page loads cross-fade (CSS only); in-app navigation does the same through components/core/Link. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-base);
+  animation-timing-function: var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal][data-reveal-variant="clip"][data-reveal-state="hidden"] {
+    clip-path: none;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

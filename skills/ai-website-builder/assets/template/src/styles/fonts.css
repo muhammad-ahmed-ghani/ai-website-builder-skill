@@ -1,0 +1,11 @@
+/*
+ * STARTER: replace with the chosen direction's font pairing (install the package with pnpm, import it here).
+ *
+ * Fonts come from npm packages (@fontsource-variable/* or @fontsource/*) imported here, for example:
+ *   @import "@fontsource-variable/fraunces";
+ *   @import "@fontsource-variable/inter";
+ * and are then named in --font-display / --font-sans in tokens.css.
+ *
+ * Never use Google Fonts links, next/font or any other network font at runtime: the sandbox has no such egress
+ * and published apps must not depend on a third party for first paint.
+ */

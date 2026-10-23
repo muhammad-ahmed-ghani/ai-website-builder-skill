@@ -1,0 +1,33 @@
+{
+  "image": { "heroBytes": 300000, "otherBytes": 150000, "widths": [480, 800, 1200, 1600] },
+  "perRoute": {
+    "jsGzipBytes": { "target": 100000, "max": 170000 },
+    "cssGzipBytes": { "target": 20000, "max": 40000 },
+    "imageBytes": { "target": 500000, "max": 1200000 },
+    "totalBytes": { "target": 700000, "max": 1600000 }
+  },
+  "lcpImageBytes": { "target": 200000, "max": 300000 },
+  "fonts": {
+    "faces": { "target": 4, "max": 6 },
+    "weights": { "target": 3, "max": 4 },
+    "latinBytes": { "target": 120000, "max": 220000 }
+  },
+  "runtime": {
+    "lcpMs": { "target": 2500, "max": 4000 },
+    "cls": { "target": 0.1, "max": 0.25 },
+    "tbtMs": { "target": 200, "max": 600 }
+  },
+  "immersive": {
+    "desktopBytes": { "target": 9000000, "max": 14000000 },
+    "mobileBytes": { "target": 3500000, "max": 6000000 },
+    "frameBytes": { "target": 60000, "max": 90000 },
+    "posterBytes": { "target": 200000, "max": 300000 },
+    "scrubVideoBytes": { "target": 8000000, "max": 12000000 },
+    "loopVideoBytes": { "target": 4000000, "max": 6000000 },
+    "cutoutBytes": { "target": 150000, "max": 250000 },
+    "mascotBytes": { "target": 40000, "max": 80000 },
+    "desktopFrames": { "target": 200, "max": 300 },
+    "mobileFrames": { "target": 90, "max": 150 },
+    "preloaderAboveMs": 1500
+  }
+}
