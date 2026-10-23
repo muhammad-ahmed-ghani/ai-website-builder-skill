@@ -12,6 +12,15 @@ and checks the result in a real browser.
 <img src="https://img.shields.io/badge/Agent_Skills-compatible-success" alt="Agent Skills compatible">
 </p>
 
+## How it works
+
+<p align="center">
+<img src="assets/pipeline.png" width="920" alt="The pipeline: a request such as an app for learning Urdu passes through reading the request, research, six inspiration boards (with more rounds on demand), concepts and proofs, binding the design, building, and verifying and repairing, and ends in a finished app with an honest report. Three principles run underneath: no invented proof, nothing pretends to work, claims need evidence.">
+</p>
+
+The loop in short. The full ten steps, with the artifact and the gate for each, are in
+[`references/00-operating-loop.md`](skills/ai-website-builder/references/00-operating-loop.md). The picture was generated with GPT Image 2.5 Sunburst.
+
 ## Use it in one line
 
 Install it (below), then tell your agent:
