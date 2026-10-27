@@ -7,7 +7,8 @@ Read sections 3 and 8-12 before writing UI (and 14 when the brief is an applicat
 Contents: 1 Commands, 2 File map, 3 Tokens, 4 Pages and sections, 5 Images, 6 AI features, 7 Do not touch, 8 Accessibility, 9 SEO, 10 Copy honesty, 11 Done, 12 Budgets and motion, 13 Immersive kit, 14 Apps.
 
 ## 1. Commands
-- `pnpm dev` dev server (PORT env). `pnpm build` = typecheck + client build + prerender; it must pass. `pnpm lint` token/a11y/SEO lint; it must pass.
+- `pnpm dev` dev server (PORT env). `pnpm build` = typecheck + client build + prerender; it must pass. `pnpm lint` token, accessibility, SEO, motion, copy and honesty lint; errors fail it, warnings print and each needs a decision.
+- Silence ONE finding with a comment `lint-ok: <rule-id> <reason>` on the line or the line above (a waiver with no reason is itself a warning). Copy rules read `scripts/copy-tells.json` (words, phrases and patterns that mark generated prose; do not edit it per project). The rendered-page checks (contrast, hierarchy, covered text, keyboard focus) run in the skill's `scripts/check-app.mjs`, not here.
 - Add packages with `pnpm add` (a font package, a small library only when the brief needs it). Keep the dependency list short.
 
 ## 2. File map

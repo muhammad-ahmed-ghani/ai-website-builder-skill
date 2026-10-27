@@ -1,0 +1,76 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Slop fixture page for the design scan to find</title>
+<meta name="description" content="A deliberately sloppy page used to prove that every design rule fires when it should, so a clean result elsewhere means something real.">
+<style>
+body{margin:0;background:#f4f1ea;color:#222;font-family:Inter,sans-serif;font-size:16px;line-height:1.6}
+.wrap{padding:24px 6px}
+.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#a64}
+h1{font-size:22px;margin:0 0 8px;font-family:Inter}
+h2{font-size:21px;margin:8px 0 8px}
+.grad{background:linear-gradient(90deg,#7c3aed,#06b6d4);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:40px}
+.card{border:1px solid #ddd;border-radius:12px;padding:16px;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.12);margin:12px 0}
+.card .card{background:#fafafa}
+.tab{border-left:4px solid #7c3aed;padding:8px 12px;background:#fff;margin:8px 0}
+.glow{box-shadow:0 0 24px rgba(124,58,237,.7);padding:12px;background:#111;color:#fff;margin:8px 0}
+.hard{box-shadow:6px 6px 0 #000;padding:12px;background:#fff;margin:8px 0;width:200px}
+.btn{transition:transform .4s cubic-bezier(.68,-0.55,.27,1.55);display:inline-block;background:#222;color:#fff;padding:2px 3px;border:0}
+.long{max-width:none;line-height:1.1}
+.low{color:#aaa}
+.onblue{background:#2563eb;color:#9ca3af;padding:8px;margin:8px 0}
+.tiny{font-size:11px}.squeeze{letter-spacing:-.08em;font-size:28px}
+.caps{text-transform:uppercase}
+.track{letter-spacing:.12em}
+.just{width:180px;text-align:justify}
+.narrowh{width:300px;font-size:30px;margin:8px 0}
+.marq{overflow:hidden;white-space:nowrap}
+.marq span{display:inline-block;animation:slide 8s linear infinite}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.dot{width:8px;height:8px;border-radius:50%;background:#2c2;display:inline-block;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.6)}}
+.tile{width:44px;height:44px;border-radius:10px;background:#eee;display:flex;align-items:center;justify-content:center}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ghost{border:1px solid #e5e5e5;border-radius:12px;padding:12px;box-shadow:0 20px 50px rgba(0,0,0,.1);background:#fff}
+.stripes{height:40px;background:repeating-linear-gradient(45deg,#eee,#eee 10px,#ddd 10px,#ddd 20px)}
+.reveal{opacity:0;padding:6px}
+.cover{position:absolute;left:0;top:150px;width:420px;height:140px;background:#111;z-index:5}
+.wbtn{display:inline-block;width:90px;background:#222;color:#fff;padding:10px 14px;margin:6px}.w3{font-weight:300}.w5{font-weight:500}.w6{font-weight:600}.w8{font-weight:800}.nofocus{outline:none;border:0;background:#eee;padding:10px 14px}
+</style></head><body>
+<div class="wrap">
+<span class="kicker">The new way to work</span>
+<h1>Supercharge your workflow</h1>
+<h2 class="grad">Seamless gradient headline</h2>
+<p>We empower teams with a world-class, cutting-edge platform that streamlines everything and elevates your journey. Not a tool. A platform. No friction. Just flow. Only results. We build — and you ship — faster — with less — and fewer — meetings — than ever — truly — always.</p>
+<p class="long">Lorem-free but very long measure paragraph that never wraps until it reaches a huge width because nobody capped the measure, so the eye has to travel an enormous distance across the screen to find the start of the next line again and again, which is exactly what readers hate, and the leading is also squeezed to a very tight value which makes multi-line reading even worse for everyone involved here.</p>
+<p class="low">Low contrast paragraph that is quite hard to read because it is light grey on white, repeated for emphasis so it has some length to it.</p>
+<div class="onblue">Grey text sitting on a saturated blue background looks washed out.</div>
+<p class="squeeze">Squeezed display type</p><p class="tiny">Tiny legal text in eleven pixels that nobody can read comfortably on a phone or a desktop at normal viewing distance anyway.</p>
+<p class="caps">An all caps paragraph that goes on for quite a while so that it is clearly long body text set in capitals which slows reading.</p>
+<p class="track">Wide tracking on a long reading paragraph makes the character groups fall apart and slows the reader considerably on any screen.</p>
+<p class="just">Justified text in a very narrow column leaves rivers of white space running down the block because there is no hyphenation here.</p>
+<h2 class="narrowh">Wonderfullyreadable now</h2>
+<div class="card">Outer card <div class="card">Inner card</div></div>
+<div class="tab">A callout with a thick coloured side stripe</div>
+<div class="glow">A glowing box</div>
+<div class="hard">Hard offset shadow</div>
+<button class="btn">Go</button> <button class="nofocus">No focus ring here</button> <a class="wbtn" href="/x">Start your free trial today</a>
+<p class="w3">Light weight sentence that is long enough to count here.</p><p class="w5">Medium weight sentence that is long enough to count here.</p><p class="w6">Semibold weight sentence that is long enough to count here.</p><p class="w8">Extra bold weight sentence that is long enough to count here.</p>
+<p>As an AI language model I cannot, but here is some placeholder text: lorem ipsum dolor sit amet, and Jane Doe from Acme Corp says it is a game-changer. It's not just an app, it's a movement — trusted by thousands.</p>
+<div class="marq"><span>Logo one · Logo two · Logo three · Logo four · Logo one · Logo two · Logo three · Logo four</span></div>
+<span class="dot"></span> Live
+<div class="grid3">
+ <div><div class="tile"><svg width="20" height="20"><circle cx="10" cy="10" r="8"/></svg></div><h3>Fast</h3><p>Words.</p></div>
+ <div><div class="tile"><svg width="20" height="20"><circle cx="10" cy="10" r="8"/></svg></div><h3>Safe</h3><p>Words.</p></div>
+ <div><div class="tile"><svg width="20" height="20"><circle cx="10" cy="10" r="8"/></svg></div><h3>Smart</h3><p>Words.</p></div>
+</div>
+<div class="grid3" style="margin-top:12px"><div class="ghost">One</div><div class="ghost">Two</div><div class="ghost">Three</div></div>
+<div class="stripes"></div>
+<p style="font-size:30px">🚀 <span>✨</span></p>
+<span style="font-size:12px;letter-spacing:.2em;text-transform:uppercase">01</span>
+<h2>Numbered section</h2>
+<img src="https://via.placeholder.com/300x200" width="300" height="200" alt="placeholder">
+<div class="reveal">Hidden text one that never reveals because the script is broken and the content stays at opacity zero for good, which is the failed reveal signature, repeated so the share is large enough to matter.</div>
+<div class="reveal">Hidden text two that never reveals because the script is broken and the content stays at opacity zero for good, which is the failed reveal signature, repeated so the share is large enough to matter.</div>
+<div class="reveal">Hidden text three that never reveals because the script is broken and the content stays at opacity zero for good, which is the failed reveal signature, repeated so the share is large enough to matter.</div>
+<div class="reveal">Hidden text four that never reveals because the script is broken and the content stays at opacity zero for good, which is the failed reveal signature, repeated so the share is large enough to matter.</div>
+</div>
+<div class="cover"></div>
+</body></html>

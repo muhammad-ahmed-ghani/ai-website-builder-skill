@@ -45,6 +45,12 @@ Each entry happened. Read the ones near your task before you start, and check yo
 
 | Symptom | Cause | Cure |
 |---|---|---|
+| A photograph sat on top of its own caption on a real generated page; every earlier gate passed | Nothing hit-tested painted text, and the picture's box was taller than designed | The design scan asks the browser what is on top at each text run (`text-occluded`); confirm after a pause so a reveal frame is not mistaken for a defect; fix the box, not the caption |
+| Table header text measured as unreadable (white on cream) although it looked right | Row and row-group backgrounds are painted but are not hit-testable, so a scan using only the hit list missed them | Measure what is behind text from the element's ancestors plus anything else the hit test finds behind it |
+| A contrast or covered-text finding that appeared on some runs and not others | The page sets smooth scrolling, so hit-testing ran against a half-scrolled page | Scroll instantly, wait two frames, measure from live positions, re-check a suspected overlap after a pause |
+| Every page ended on a cream ground with a clay accent, or in Cormorant, and nobody chose it | A free axis resolved to the generator's default | `cream-palette`, `overused-font` and the other `review` rules force a decision and a written reason |
+| A success message appeared and nothing was sent | The handler set state and made no request | A flow can assert a request (`mark`, then `assert_request`); the lint flags a success string with no fetch behind it |
+| Headline and first action sat below the fold on a laptop | A tall hero was composed on a phone and scaled up | `below-the-fold` at 1024 px and wider: the h1 and the first boxed action must end inside the window |
 | "Finished" with the plan still loading and critique errors unresolved | The run ended without settling the list and the verdict was inflated | Settle every to-do item at every ending; `partial` while anything is open or unverified; list what is open in plain words |
 | A repair that made things worse | No comparison after the change | Re-run the same gates on affected pages; roll back when worse, no change, or as many new problems as fixed |
 | A regression introduced by a fix | Fixes were not re-checked | One more regression pass after repairs |

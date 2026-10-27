@@ -11,7 +11,7 @@ Automatic gates (run them every time; fix before polishing):
 - Honesty gates: no invented proof, contact details, response times or guarantees; no third-party form endpoint; no dead form or dead call to action; no unused supplied asset; no AI image captioned as evidence.
 - Performance budgets from `04-build-system.md`.
 - Acceptance flows: every feature's steps (`.app-notes/flows.json`, run by `check-app.mjs --flows`) run in a real browser, each in a fresh visitor, and pass. A feature with no flow is not verified.
-- Design detector: raw colours, palette classes, banned or overused fonts, purple-blue gradients, gradient text, `transition: all`, bounce easing, emoji as icons, three equal card rows, centred-everything, missing reduced-motion block, missing focus style, lorem, stock alt text, weightless copy.
+- Design detector, two tiers. Source (`pnpm lint`): raw colours, palette classes, banned or overused fonts, gradients and gradient text, `transition: all`, animated layout, bounce easing, emoji as icons, a removed focus outline, missing reduced-motion block, lorem, template copy. Rendered (`check-app.mjs` design scan, every size): contrast of what is actually painted, type hierarchy, measure and leading, covered or never-revealed text, button labels that wrap, the first screen below the fold, keyboard focus you cannot see, nested cards, side stripes, glows, marquees, default faces, generated-prose copy. Rules, severities and fixes: `09-design-craft.md` section 6. `major` and `minor` findings count; `review` findings need a decision and, if kept, a reason in the report.
 - For a signature moment: the built home page has an element tagged `data-signature` and it actually moves (or is `static`).
 
 ## 2. Capture the evidence (run `scripts/check-app.mjs`, or do the same by hand)
@@ -73,6 +73,8 @@ You are fixing defects that were measured; you did not see them yet, so look fir
 - After fixes, run one more regression pass: the repairs themselves can break something. A weak design score (below about 55 of 100) deserves double the time.
 
 ## 5. The critic
+
+Run it as two isolated assessments (`09-design-craft.md` section 9): the design review first and unanchored, the scan after, then a synthesis that names agreements, misses and false positives. Score the ten usability heuristics and walk two or three personas through the main action; severities P0 to P3. With helpers, use two separate helpers; alone, say in the report that the review ran in one context.
 
 After the gates, review the built app against the chosen board, DESIGN.md and the proofs: two or three screenshots of the home page plus every page's first screen. Name numbered, concrete, located fixes (what, where, which token or composition change); the lead ranks them; a repairer applies them; a round is kept only if the gates do not regress and a side-by-side look says it improved. Treat critic noise honestly: a finding you cannot reproduce in a picture is not a finding.
 
