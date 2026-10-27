@@ -18,7 +18,7 @@ A BOARD is one picture of ONE design direction, shown as four different screens 
 
 ### How to get six different directions
 
-Have two reasoners (or two passes) think about the SAME research with different lenses: (1) the physical reality of the offer (materials, place, process); (2) the visitor's feeling and the category's culture. Each proposes directions, then curate six that differ on the axes below. Reject sets where two share a medium and palette family.
+Have two reasoners (or two passes) think about the SAME research with different lenses: (1) the physical reality of the offer (materials, place, process); (2) the visitor's feeling and the category's culture. Each proposes directions, then curate six that differ on the axes below. Reject sets where two share a medium and palette family. Draw the candidates from the audience's own world (its print and screen traditions, notation, places, rituals), seven ranked by resonance, and keep out the page this category always ships and its predictable opposite: the method and the rut test are in `09-design-craft.md` section 2.
 
 Each direction is written as data a builder can use:
 - name; why it fits this client; the world (a real material, place, artefact or print tradition as metaphor, not the obvious category image)
@@ -85,7 +85,7 @@ Moves are rules a builder can execute, never moods. Combine coherently; a still,
 - Type: scale-extreme (headline 5 to 9x body, hierarchy by scale alone) · optical-size-pair (one variable serif, opsz max for display, min for text) · fat-display-statement · tight-display (leading 0.88 to 1.0, -0.03em) · width-axis-poster (expanded wdth for headlines) · mono-for-facts (tabular mono for prices, hours, dates) · one-italic-beat (one italic word per headline) · index-numerals (only when the order is real) · type-as-image (a giant cropped letterform is the hero) · lede-and-dropcap.
 - Layout: asymmetric-split (7/5 or 8/4, never 50/50, with a real counterweight) · hairline-structure (1px rules, not cards) · index-rows (full-width rows instead of card grids, with a resting state for touch) · sticky-rail · offset-overlap (8 to 15 percent on purpose) · one-broken-element (strict grid, ONE element breaks it) · big-quiet (one sentence per screen, 160 to 240 px padding) · hierarchical-bento (one cell twice the area; equal tiles is the slop version) · artefact-as-ui · content-first-hero (the hero IS the menu, schedule, live product) · full-bleed-caption-rail · inverse-climax-band (exactly one inverted band).
 - Colour: one-ink-one-paper · tinted-neutrals · material-palette · dark-ground-light-islands · duotone-system · accent-scarcity (at most three appearances per screen, always meaning "act here").
-- Imagery: single-hero-light (one hero with directional light and a stated lens) · process-sequence (3 to 5 frames of the work) · object-on-flat · macro-texture (backgrounds and dividers only) · diagram-as-image (must be accurate) · type-only.
+- Imagery: single-hero-light (one hero with directional light and a stated lens) · process-sequence (3 to 5 frames of the work) · object-on-flat · macro-texture (backgrounds and dividers only) · diagram-in-markup (built as inline SVG or HTML from the tokens, never generated as a picture; see `12-diagrams.md`) · type-only.
 - Motion: clip-reveal-once · hover-invert-rows · number-ticker (real numbers only) · view-transitions (under 300 ms) · still-on-purpose. Immersive moves (scrub-film, scrub-frames, pinned-chapters, shader-hero, cutout-depth, mascot, loop-hero) are rare: at most ONE concept proposes one, only when the brief calls for a moving, scroll-driven page; never for information-first or high-trust briefs (law, health, money, public service, schools, documentation) or low-bandwidth ones. See `04-build-system.md`.
 - Interaction: live-status (open now, closes in 2h: true and computed from real hours) · hover-preview-index · copy-snippet.
 - Copy: specific-over-superlative ("8 people per class", not "amazing") · labels-as-voice · honest-limits (say what it is not for).
@@ -106,6 +106,8 @@ Moves are rules a builder can execute, never moods. Combine coherently; a still,
 12. Conversion honesty: the primary action is visible without scrolling, named by its result, repeated only where the decision is ripe.
 
 ## 5. Refuse the AI defaults, unless earned
+
+The QA script measures most of these (`09-design-craft.md` section 6 maps each tell to its rule); a `review` finding is kept only with a written reason.
 
 A choice is legitimate only if you can trace it to THIS client's world and audience in one sentence. An earned choice (a warm earthy palette for a clay studio) is not a tell; the same choice by habit is. Do not over-correct: refusing warmth for a pottery studio to avoid a cliché is as wrong as defaulting to it.
 

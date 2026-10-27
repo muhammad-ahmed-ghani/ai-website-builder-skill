@@ -1,10 +1,10 @@
 ---
 name: ai-website-builder
-description: "Build an app that is designed, honest and verified instead of a template. Use for any request to create, redesign or substantially extend a web app in any stack: a marketing or landing page app, portfolio, local-business app, store front, docs, dashboard, tool, portal, or a learning app such as 'an app for learning a language'. Gives the whole method: reading what the person really wants (an app to read or an app to use), research and content strategy, six-direction inspiration boards chosen from pictures, a binding design baseline, a token-driven build with a starter template, honesty rules (no invented proof, nothing fake working), real-browser QA with evidence, repair, and an honest closing report. Includes a starter template, a contrast checker, a QA capture script and an image optimiser."
+description: "Build an app that is designed, honest and verified instead of a template. Use for any request to create, redesign or substantially extend a web app in any stack: a marketing or landing page app, portfolio, local-business app, store front, docs, dashboard, tool, portal, or a learning app such as 'an app for learning a language'. Gives the whole method: reading what the person really wants (an app to read or an app to use), research and content strategy, six-direction inspiration boards chosen from pictures, design craft (visitor modes, a measured design scan, named refinement passes), a binding baseline, a token-driven build with a starter template, honesty rules (no invented proof, nothing fake working), real-browser QA with evidence, repair, and an honest closing report. Includes a starter template, a contrast checker, a QA script with a design scan and an image optimiser."
 argument-hint: "[what to build, in the person's words]"
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
   origin: "Distilled from a production AI app builder: its pipeline, rules, lint gates and the failures its real runs taught it"
 ---
 
@@ -18,10 +18,10 @@ Before any tool call, decide which of these you are building. Read `references/0
 
 | The person asks for... | Build | Read |
 |---|---|---|
-| An app about a business, person, place or thing they sell | A reading app: story, real proof they gave, a way to reach them | 01, 02, 03, 04 |
-| Something to USE: a dashboard, tool, portal, "like Slack but...", a redesign of a working tool | A working app: `/` is the working screen, with demo data and, if people sign in, visible demo credentials | 01, 05 first, then 03, 04 |
-| An activity (learning a language, exam practice, planning, tracking) with an audience and no business named | A working app. For learning: a designed home with sections, then lessons, practice, progress. NOT a brochure for an invented school | 01, 05 |
-| A page that presents an existing product | A reading app about that product | 01, 02, 03, 04 |
+| An app about a business, person, place or thing they sell | A reading app: story, real proof they gave, a way to reach them | 01, 02, 03, 09, 04, 10 |
+| Something to USE: a dashboard, tool, portal, "like Slack but...", a redesign of a working tool | A working app: `/` is the working screen, with demo data and, if people sign in, visible demo credentials | 01, 05 first, then 03, 09, 04 |
+| An activity (learning a language, exam practice, planning, tracking) with an audience and no business named | A working app. For learning: a designed home with sections, then lessons, practice, progress. NOT a brochure for an invented school | 01, 05, 09 |
+| A page that presents an existing product | A reading app about that product | 01, 02, 03, 09, 04, 10 |
 
 The word "website" in a request does not decide it; owner words ("my academy", "our shop") and what people will do in it do. When in doubt, build the working-app reading and say so in your first message.
 
@@ -29,23 +29,23 @@ The word "website" in a request does not decide it; owner words ("my academy", "
 
 1. **Read the request.** Write `.app-notes/brief.json` (facts with the person's own words, unknowns, assumptions) and `.app-notes/requirements.json` (every thing they say, now and later). Ask at most one grouped question, only if a wrong guess would change the build.
 2. **Research and strategy** (beside step 3). Study the real category, write the nine strategy answers and the design thesis. `references/02-research-and-strategy.md`
-3. **Inspiration boards** (beside step 2). Six boards per round; each board is ONE design shown as four screens of the same app, about 2048 x 1280; the person can ask for more rounds until satisfied. `references/03-design-direction.md`
+3. **Inspiration boards** (beside step 2). Six boards per round; each board is ONE design shown as four screens of the same app, about 2048 x 1280; the person can ask for more rounds until satisfied. The six come from six candidate worlds in the audience's culture, not six adjectives (`references/09-design-craft.md` section 2). `references/03-design-direction.md`
 4. **Concepts, proofs, panel.** One concept per board, structurally different; render each as a real page; score them; choose.
 5. **Bind the direction.** `DESIGN.md`, `tokens.css`, `fonts.css`, contrast check, a blueprint per page.
 6. **Plan.** Pages and sections with one-line jobs, features with executable acceptance steps, images with jobs.
 7. **Build.** Foundation first, then page builders in parallel, then an integrator. Tokens only, real copy, real images, working controls. `references/04-build-system.md`, and `05-working-apps.md` for working apps.
-8. **Verify** with `scripts/check-app.mjs` on the production build: three sizes, scroll the way a visitor scrolls, pictures, measured facts, feature flows, a recorded tour. `references/06-qa-and-repair.md`
-9. **Repair** at the cause; re-check; roll back what made it worse.
+8. **Verify** with `scripts/check-app.mjs` on the production build: three sizes, scroll the way a visitor scrolls, pictures, measured facts, a design scan (contrast, type, hierarchy, covered text, generator tells), feature flows, a recorded tour. `references/06-qa-and-repair.md`
+9. **Critique, then repair.** Judge the design first, unanchored; then read the scan; then run the named passes (layout, typeset, colorize, bolder, harden, polish...) one at a time, each scoped, each ending in evidence. Fix causes; re-check; roll back what made it worse. `references/09-design-craft.md`
 10. **Polish against the chosen picture,** then **report honestly** from measurements only.
 
-Do not skip 3, 4 and 8: they are where an app stops being a template and where "done" stops being a claim. Run independent steps together.
+Do not skip 3, 4, 8 and 9: they are where an app stops being a template and where "done" stops being a claim. Run independent steps together.
 
 ## Non-negotiables
 
 1. **Honesty outranks everything.** Never invent testimonials, logos, press, ratings, statistics, awards, team members, addresses, emails, phone numbers, prices, hours, reply times, policies, guarantees or qualifications. A missing fact is left out (the default), turned into an invitation, or marked once with a visible `<Draft>` for the owner. Counting what the person did not list is inventing. Sample data in a working app is allowed only because the app says "Demo data" on screen.
 2. **Nothing pretends to work.** No `href="#"`, no form that goes nowhere, no disabled "not connected yet" button, no third-party form service the person did not choose, no login that accepts anything. Wire it for real or leave it out and say so.
 3. **Never claim what was not measured.** Not "tested", "verified", "accessible", "polished" or "responsive" without evidence for that exact claim. "Could not look" is never "clean". Never say work has started unless you made the call that starts it.
-4. **Decide the look from pictures, before code,** and build to the chosen picture. No stock looks. Refuse the first- and second-order AI tells unless this client's world earns them.
+4. **Decide the look from pictures, before code,** and build to the chosen picture. No stock looks. Refuse the first- and second-order AI tells unless this client's world earns them (`09` lists them as rules the QA script measures; a `review` finding is kept only with a reason).
 5. **One design system.** Colour, type, radius, shadow and easing come only from tokens. Two type families at most. One signature moment and one deliberate imperfection. Accent used scarcely.
 6. **Pictures are generous, art-directed and never faked.** About one per screen of scrolling, one shared style, through the image manifest, real alt text; no hand-drawn SVG pictures of objects or people; no lettering inside images; no AI image captioned as a real event.
 7. **Right language, right script.** `lang` and `dir` set; real script (never transliteration standing in for it); logical CSS properties; translations you cannot verify are flagged for the owner.
@@ -62,8 +62,9 @@ bash <skill>/scripts/scaffold.sh ./my-app [--app]           # copy the starter, 
 node <skill>/scripts/contrast.mjs --tokens src/styles/tokens.css   # every colour pair a component uses, light and dark
 node <skill>/scripts/optimize-images.mjs --src .app-notes/originals --alt .app-notes/alt.json   # avif + webp set and the manifest
 pnpm build && pnpm preview                                  # serve the PRODUCTION build (leave it running)
-node <skill>/scripts/check-app.mjs --url http://localhost:4173 --flows .app-notes/flows.json --tour
-                                                            # pictures, measured facts, feature flows, recorded visit, report
+node <skill>/scripts/check-app.mjs --url http://localhost:4173 --flows .app-notes/flows.json --tour [--extremes]
+                                                            # pictures, measured facts, design scan, feature flows, recorded visit, report
+                                                            # --extremes adds 320x640 and 1920x1080; --no-design skips the scan
 ```
 
 The QA script needs Playwright (`pnpm add -D playwright && npx playwright install chromium`) or `--chrome /path/to/chrome`. The optimiser needs `sharp`.
@@ -91,4 +92,12 @@ What you built (pages, features); for a working app, what is real and what is mo
 | `references/06-qa-and-repair.md` | verifying, judging, repairing, critique, the closing report |
 | `references/07-failure-catalogue.md` | before you start and before you report: what went wrong before and the cure |
 | `references/08-role-briefs.md` | briefing helper agents; mapping tool names |
+| `references/09-design-craft.md` | choosing how hard to push (visitor modes), building a world, colour and type floors, the tells as rules, the refinement passes, the two assessments, scoring |
+| `references/10-copy-and-voice.md` | writing or reviewing any words on the app: voice from facts, slot rules, the generated-prose tells |
+| `references/11-listening-to-the-audience.md` | the research step: hearing the audience's worries and words without borrowing their claims |
+| `references/12-diagrams.md` | a how-it-works, process, flow or architecture picture; built in markup from tokens |
+| `references/13-reference-teardown.md` | measuring up to three reference apps for craft and structure during research |
+| `references/14-scripts-and-app-jobs.md` | fonts for a non-Latin script; what visitors come to do in each kind of app; accessibility additions |
+| `references/15-redesign-and-extension.md` | an app already exists: record it, choose polish, restyle or full, prove nothing was lost |
+| `references/NOTICE.md` | credits and licences of the public projects this skill learned from |
 | `assets/checklists/brief.md`, `done.md` | the shapes of the ledgers; the last check |

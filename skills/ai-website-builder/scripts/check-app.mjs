@@ -7,6 +7,9 @@
  *   node check-app.mjs --url http://localhost:4173 --flows .app-notes/flows.json    run the features' acceptance flows
  *   node check-app.mjs --url http://localhost:4173 --sizes 390x844,1440x900
  *   node check-app.mjs --url ... --chrome /path/to/chrome            use an installed Chrome instead of Playwright's download
+ *   node check-app.mjs --url ... --facts .app-notes/brief.json       flag numbers on the page that no fact in the brief contains
+ *   node check-app.mjs --url ... --extremes                         also check 320x640 and 1920x1080 (narrowest phone, wide screen)
+ *   node check-app.mjs --url ... --no-design                         skip the design scan (type, contrast, hierarchy, AI tells)
  *
  * Serve the PRODUCTION build (pnpm build && pnpm preview), not the dev server. Needs `playwright` or `playwright-core` with a browser
  * (pnpm add -D playwright && npx playwright install chromium). Routes default to "/" plus every internal link found on it.
@@ -18,15 +21,20 @@
  *   tour-<size>.webm              with --tour
  * Flows file (--flows): [{ "name": "open a lesson", "size": "desktop", "steps": [ {"do":"goto","path":"/lessons/"}, {"do":"click","selector":"text=Say hello"},
  *   {"do":"fill","selector":"input[name=email]","value":"a@example.com"}, {"do":"press","key":"Enter"}, {"do":"wait","ms":500},
- *   {"do":"assert_text","text":"Say hello"}, {"do":"assert_visible","selector":"main h1"}, {"do":"assert_url","contains":"/lesson"} ] }]
+ *   {"do":"assert_text","text":"Say hello"}, {"do":"assert_visible","selector":"main h1"}, {"do":"assert_url","contains":"/lesson"},
+ *   {"do":"mark"}, {"do":"click","selector":"text=Send"}, {"do":"assert_request","method":"POST","urlContains":"/f/"}   a "sent" message needs a request behind it ] }]
  * Every flow runs in a fresh browser context (like a new visitor), so start each from the sign-in screen when the product has one.
+ * The design scan (lib/design-scan.mjs) measures how the page is made: rendered contrast, type hierarchy, line length, leading, heading rhythm, covered or
+ * never-revealed text, nested cards, side stripes, glows, bounce easing, marquees, default faces, template copy. Its findings are major, minor, or
+ * `review` (a judgement call: reported with the fix, never counted against the verdict; keep one only if the chosen picture earns it).
  * Verdict: fail with any blocker, partial with a major or anything not verified, pass otherwise. Exit code 1 on fail.
  * Measured facts only. Looking at the pictures, and judging them, is still your job (see references/06-qa-and-repair.md).
  */
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { designScan, RULES } from "./lib/design-scan.mjs";
 
 const argv = process.argv.slice(2);
 const flag = (k) => argv.includes(`--${k}`);
@@ -48,11 +56,19 @@ if (!base) {
   process.exit(2);
 }
 const OUT = path.resolve(value("out", ".app-notes/qa"));
-const SIZES = (list("sizes") ?? ["390x844", "768x1024", "1440x900"]).map((s) => {
+const SIZES = (list("sizes") ?? ["390x844", "768x1024", "1440x900", ...(flag("extremes") ? ["320x640", "1920x1080"] : [])]).map((s) => {
   const [w, h] = s.split("x").map(Number);
   return { w, h, name: w <= 480 ? "phone" : w <= 900 ? "tablet" : "desktop", id: `${w}` };
 });
 const MAX_PAGE_PX = 15000;
+// Shared with the template's lint: the words, phrases and patterns that mark generated copy. Optional; the scan falls back to a short list.
+const tellsFile = new URL("./lib/copy-tells.json", import.meta.url);
+let copyTells = null;
+try {
+  if (existsSync(tellsFile)) copyTells = JSON.parse(readFileSync(tellsFile, "utf8"));
+} catch {
+  copyTells = null;
+}
 
 async function loadPlaywright() {
   const here = createRequire(import.meta.url);
@@ -82,6 +98,15 @@ const browser = await chromium.launch(executablePath ? { executablePath } : {}).
 const issues = [];
 const notVerified = [];
 const artefacts = [];
+const designStats = [];
+let factsText = "";
+if (value("facts")) {
+  try {
+    factsText = readFileSync(path.resolve(value("facts")), "utf8");
+  } catch (e) {
+    console.error(`Could not read --facts ${value("facts")}: ${String(e.message ?? e).split("\n")[0]}`);
+  }
+}
 const pages = [];
 const add = (severity, route, size, category, summary, evidence) => issues.push({ severity, route, size, category, summary, ...(evidence ? { evidence } : {}) });
 const slug = (r) => (r === "/" ? "home" : r.replace(/^\/|\/$/g, "").replace(/[^a-z0-9]+/gi, "-"));
@@ -150,6 +175,67 @@ const measure = () => {
   };
 };
 
+/** Tab through the controls the way a keyboard visitor does and check that something visible changes, and that the ring is readable. */
+async function checkFocus(page, route, size) {
+  try {
+    await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: "instant" }));
+    const list = await page.evaluate(() => {
+      const sig = (el) => {
+        const cs = getComputedStyle(el);
+        return [cs.outlineStyle, cs.outlineWidth, cs.outlineColor, cs.boxShadow, cs.borderTopColor, cs.borderTopWidth, cs.backgroundColor, cs.color, cs.textDecorationLine, cs.opacity, cs.transform].join("|");
+      };
+      const els = [...document.querySelectorAll("a[href], button, input:not([type=hidden]), select, textarea, [tabindex]:not([tabindex='-1'])")].filter((el) => {
+        const r = el.getBoundingClientRect();
+        return r.width > 2 && r.height > 2 && getComputedStyle(el).visibility !== "hidden" && !el.disabled;
+      });
+      window.__focusBase = new Map(els.map((el) => [el, sig(el)]));
+      window.__focusSig = sig;
+      return els.length;
+    });
+    const bad = [];
+    const low = [];
+    for (let i = 0; i < Math.min(list, 30); i++) {
+      await page.keyboard.press("Tab");
+      await page.waitForTimeout(60);
+      const r = await page.evaluate(() => {
+        const el = document.activeElement;
+        if (!el || el === document.body || !window.__focusBase.has(el)) return null;
+        const label = `${el.tagName.toLowerCase()} "${(el.getAttribute("aria-label") || el.textContent || el.getAttribute("name") || "").trim().slice(0, 24)}"`;
+        const cs = getComputedStyle(el);
+        const changed = window.__focusSig(el) !== window.__focusBase.get(el);
+        let ratio = null;
+        if (cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) > 0) {
+          const cv = document.createElement("canvas"); cv.width = cv.height = 1;
+          const cx = cv.getContext("2d", { willReadFrequently: true });
+          const px = (css) => { cx.clearRect(0, 0, 1, 1); cx.fillStyle = "rgba(1,2,3,.5)"; cx.fillStyle = css; cx.fillRect(0, 0, 1, 1); const d = cx.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2], d[3] / 255]; };
+          let bg = [255, 255, 255, 1];
+          let pictured = false;
+          for (let e = el.parentElement; e; e = e.parentElement) { const s = getComputedStyle(e); if (s.backgroundImage !== "none") { pictured = true; break; } const c = px(s.backgroundColor); if (c[3] >= 0.99) { bg = c; break; } }
+          if (pictured) return { label, changed, ratio: null };
+          const fg = px(cs.outlineColor);
+          const L = ([r, g, b]) => { const f = (v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+          const [a, b2] = [L(fg), L(bg)].sort((x, y) => y - x);
+          ratio = (a + 0.05) / (b2 + 0.05);
+        }
+        return { label, changed, ratio };
+      });
+      if (!r) continue;
+      if (!r.changed) bad.push(r.label);
+      else if (r.ratio !== null && r.ratio < 2.95) low.push(`${r.label} ${r.ratio.toFixed(1)}:1`);
+    }
+    if (bad.length) {
+      add("major", route, size.name, "design:a11y", `focus-not-visible x${bad.length}`, bad.slice(0, 4).join("; "));
+      issues[issues.length - 1].rule = "focus-not-visible";
+    }
+    if (low.length) {
+      add("minor", route, size.name, "design:a11y", `focus-low-contrast x${low.length}`, low.slice(0, 4).join("; "));
+      issues[issues.length - 1].rule = "focus-low-contrast";
+    }
+  } catch (e) {
+    notVerified.push(`The keyboard focus check could not run on ${route}: ${String(e.message ?? e).split("\n")[0].slice(0, 100)}`);
+  }
+}
+
 async function checkRoute(route, size, ctxOptions = {}) {
   const context = await browser.newContext({ viewport: { width: size.w, height: size.h }, isMobile: size.w <= 480, hasTouch: size.w <= 480, deviceScaleFactor: 1, ...ctxOptions });
   const page = await context.newPage();
@@ -183,6 +269,27 @@ async function checkRoute(route, size, ctxOptions = {}) {
   }
   await page.evaluate(() => window.scrollTo(0, 0));
   const m = await page.evaluate(measure);
+  if (!flag("no-design")) {
+    const scan = await page.evaluate(designScan, { tells: copyTells }).catch((e) => ({ error: String(e.message ?? e).split("\n")[0] }));
+    if (scan.error) notVerified.push(`The design scan could not run on ${route} at ${size.name}: ${scan.error.slice(0, 120)}`);
+    else {
+      for (const [rule, h] of Object.entries(scan.hits)) {
+        const def = RULES[rule] ?? { severity: "review", category: "design", fix: "" };
+        add(h.sev ?? def.severity, route, size.name, `design:${def.category}`, `${rule}${h.count > 1 ? ` x${h.count}` : ""}`, h.evidence.join("; "));
+        issues[issues.length - 1].rule = rule;
+      }
+      if (factsText && size.w >= 1024) {
+        const unsourced = (scan.stats.numbers ?? []).filter((n) => !factsText.includes(n) && !factsText.includes(n.replace(/,/g, "")));
+        if (unsourced.length) {
+          add("review", route, size.name, "design:copy", `unsourced-number x${unsourced.length}`, unsourced.slice(0, 8).join(", "));
+          issues[issues.length - 1].rule = "unsourced-number";
+        }
+      }
+      const { numbers, ...stats } = scan.stats;
+      designStats.push({ route, size: size.name, ...stats });
+    }
+    if (size.w >= 1024 && !flag("no-focus")) await checkFocus(page, route, size);
+  }
 
   // The measured issues.
   if (m.scrollWidth > m.viewportWidth + 1) add("major", route, size.name, "layout", `Sideways scroll: the page is ${m.scrollWidth}px wide in a ${m.viewportWidth}px window`, m.offenders.join("; "));
@@ -234,6 +341,30 @@ for (const route of routes) {
   }
 }
 
+// ---- reduced motion: does the page honour the preference? ----
+if (!flag("no-design") && pages.length) {
+  const size = SIZES[SIZES.length - 1];
+  const context = await browser.newContext({ viewport: { width: size.w, height: size.h }, reducedMotion: "reduce" });
+  const page = await context.newPage();
+  try {
+    await page.goto(base + routes[0], { waitUntil: "load", timeout: 30000 });
+    await page.waitForTimeout(1500);
+    const running = await page.evaluate(() =>
+      (document.getAnimations?.() ?? [])
+        .filter((a) => a.playState === "running" && a.effect?.getTiming?.().iterations === Infinity && a.effect.target && a.effect.target.getBoundingClientRect().width > 8)
+        .slice(0, 4)
+        .map((a) => `${a.effect.target.tagName.toLowerCase()}${typeof a.effect.target.className === "string" && a.effect.target.className ? "." + a.effect.target.className.trim().split(/\s+/)[0] : ""}`),
+    );
+    if (running.length) {
+      add("minor", routes[0], size.name, "design:motion", "motion-ignores-preference", `${running.length} infinite animation(s) still run under prefers-reduced-motion: ${running.join(", ")}`);
+      issues[issues.length - 1].rule = "motion-ignores-preference";
+    }
+  } catch (e) {
+    notVerified.push(`The reduced-motion check could not run: ${String(e.message ?? e).split("\n")[0].slice(0, 100)}`);
+  }
+  await context.close();
+}
+
 // ---- links: every internal link found, once ----
 if (!flag("no-links") && pages.length) {
   const seen = new Set();
@@ -269,7 +400,10 @@ if (flowsFile) {
     const size = SIZES.find((x) => x.name === (flow.size ?? "desktop")) ?? SIZES[SIZES.length - 1];
     const context = await browser.newContext({ viewport: { width: size.w, height: size.h }, isMobile: size.w <= 480, hasTouch: size.w <= 480 });
     const page = await context.newPage();
+    const requests = [];
+    page.on("request", (rq) => requests.push({ method: rq.method(), url: rq.url(), at: Date.now() }));
     let failed = null;
+    let mark = 0;
     for (const [n, step] of (flow.steps ?? []).entries()) {
       try {
         const t = { timeout: 6000 };
@@ -281,7 +415,13 @@ if (flowsFile) {
         else if (step.do === "wait") await page.waitForTimeout(Number(step.ms ?? 300));
         else if (step.do === "assert_visible") await page.locator(step.selector).first().waitFor({ state: "visible", ...t });
         else if (step.do === "assert_text") await page.locator(step.selector ?? "body").first().getByText(String(step.text), { exact: false }).first().waitFor({ state: "visible", ...t });
-        else if (step.do === "assert_url") {
+        else if (step.do === "mark") mark = requests.length;
+        else if (step.do === "assert_request") {
+          // Proves a "sent" message has a real request behind it. Put {"do":"mark"} before the click or submit, then this step after it.
+          await page.waitForTimeout(Number(step.wait ?? 800));
+          const seen = requests.slice(mark).filter((r) => (!step.method || r.method === String(step.method).toUpperCase()) && (!step.urlContains || r.url.includes(String(step.urlContains))));
+          if (!seen.length) throw new Error(`no ${step.method ?? "network"} request${step.urlContains ? ` to ${step.urlContains}` : ""} left the page since the mark: the success message has nothing behind it`);
+        } else if (step.do === "assert_url") {
           await page.waitForURL((u) => u.href.includes(String(step.contains)), { timeout: 6000 });
         } else throw new Error(`unknown step "${step.do}"`);
       } catch (e) {
@@ -347,20 +487,28 @@ if (flag("tour")) {
 await browser.close();
 
 // ---- verdict and files ----
-const order = { blocker: 0, major: 1, minor: 2 };
+const order = { blocker: 0, major: 1, minor: 2, review: 3 };
 issues.sort((a, b) => order[a.severity] - order[b.severity]);
-const counts = { blocker: 0, major: 0, minor: 0 };
+const counts = { blocker: 0, major: 0, minor: 0, review: 0 };
 for (const i of issues) counts[i.severity]++;
 const verdict = counts.blocker ? "fail" : counts.major || notVerified.length ? "partial" : "pass";
-const report = { verdict, counts, base, routes, sizes: SIZES.map((s) => `${s.w}x${s.h}`), flows: flowResults, issues, artefacts: artefacts.slice(0, 40), notVerified, pages: pages.map(({ internalLinks, ...p }) => p) };
+const report = { verdict, counts, base, routes, sizes: SIZES.map((s) => `${s.w}x${s.h}`), flows: flowResults, design: designStats, issues, artefacts: artefacts.slice(0, 40), notVerified, pages: pages.map(({ internalLinks, ...p }) => p) };
 writeFileSync(path.join(OUT, "report.json"), JSON.stringify(report, null, 1));
 
 const md = [
   `# QA report: ${verdict.toUpperCase()}`,
-  `${counts.blocker} blockers, ${counts.major} majors, ${counts.minor} minors. Pages: ${routes.join(", ")}. Sizes: ${report.sizes.join(", ")}.`,
+  `${counts.blocker} blockers, ${counts.major} majors, ${counts.minor} minors, ${counts.review} to review. Pages: ${routes.join(", ")}. Sizes: ${report.sizes.join(", ")}.`,
   "",
   "## Issues",
   ...(issues.length ? issues.map((i) => `- **${i.severity}** \`${i.route}\` ${i.size}, ${i.category}: ${i.summary}${i.evidence ? ` (${i.evidence})` : ""}`) : ["None measured."]),
+  "",
+  "## What to do about the design findings",
+  ...(() => {
+    const rules = [...new Set(issues.filter((i) => i.rule).map((i) => i.rule))];
+    return rules.length
+      ? rules.map((r) => `- \`${r}\` (${RULES[r]?.severity ?? "review"}): ${RULES[r]?.fix ?? ""}`)
+      : ["No design findings."];
+  })(),
   "",
   "## Flows",
   ...(flowResults.length ? flowResults.map((f) => `- ${f.ok ? "pass" : "FAIL"} "${f.name}" (${f.size})${f.ok ? "" : `: step ${f.failed.step} ${f.failed.do}: ${f.failed.error}`}`) : ["None run."]),
@@ -380,6 +528,6 @@ const rows = routes
   .join("\n");
 writeFileSync(path.join(OUT, "contact-sheet.html"), `<!doctype html><meta charset="utf-8"><title>Contact sheet</title><style>body{font:14px system-ui;margin:16px}td,th{vertical-align:top;padding:8px;text-align:left}</style><h1>Contact sheet</h1><p>Click a picture for the whole page.</p><table><tr><th></th>${SIZES.map((s) => `<th>${s.name} ${s.w}</th>`).join("")}</tr>${rows}</table>`);
 
-console.log(`\nVerdict: ${verdict.toUpperCase()}  (${counts.blocker} blockers, ${counts.major} majors, ${counts.minor} minors)`);
+console.log(`\nVerdict: ${verdict.toUpperCase()}  (${counts.blocker} blockers, ${counts.major} majors, ${counts.minor} minors, ${counts.review} to review)`);
 console.log(`Report: ${path.join(OUT, "report.md")}\nPictures: ${path.join(OUT, "contact-sheet.html")}`);
 process.exit(verdict === "fail" ? 1 : 0);

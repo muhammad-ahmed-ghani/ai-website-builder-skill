@@ -68,7 +68,7 @@ Ask only when the answer changes what you build and cannot be inferred: whether 
 Route the message first, in plain words:
 - Question: answer it, change nothing.
 - Edit: the smallest change that does it; re-check only what it touched.
-- Restyle: a new direction, then rebuild what the new tokens reach.
+- Restyle: a new direction, then rebuild what the new tokens reach. When the app already exists (the person hands you its code or its address), read `15-redesign-and-extension.md` first: name the depth (polish, restyle or full), record what the app says and does, and prove nothing was lost.
 - Add a page or feature: plan it into the existing structure.
 - Fix an error: reproduce, fix the cause.
 - Expansion: more of the same app (see above).

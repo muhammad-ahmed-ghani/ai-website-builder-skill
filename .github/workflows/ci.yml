@@ -33,3 +33,17 @@ jobs:
           node-version: "22"
       - name: Scaffold the working-app starter, then install, lint and build it
         run: bash skills/ai-website-builder/scripts/scaffold.sh "$RUNNER_TEMP/demo-app" --app
+      - name: Self-test the starter's lint rules
+        run: cd "$RUNNER_TEMP/demo-app" && node scripts/lint.test.ts
+
+  design-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install a browser for the design scan
+        run: npm install --no-save playwright && npx playwright install --with-deps chromium
+      - name: The sloppy fixture trips every design rule and the clean one trips none
+        run: node tools/tests/design-scan.test.mjs

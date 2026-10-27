@@ -8,7 +8,7 @@ and checks the result in a real browser.
 
 <p align="center">
 <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT">
-<img src="https://img.shields.io/badge/skill-v1.1.0-informational" alt="skill v1.1.0">
+<img src="https://img.shields.io/badge/skill-v1.2.0-informational" alt="skill v1.2.0">
 <img src="https://img.shields.io/badge/Agent_Skills-compatible-success" alt="Agent Skills compatible">
 </p>
 
@@ -38,6 +38,11 @@ a learning app), and builds the right one. The word "website" in a request does 
 - **Research before design.** The real category, the audience's worries, nine strategy answers and a design thesis.
 - **Six directions from pictures.** Each round makes six inspiration boards. A board is one design shown as four screens of the same app. The person can
   ask for more rounds until something is right. Without an image model it renders six rough HTML proofs instead and says so.
+- **Design craft, not just tokens.** Visitor modes decide how hard to push on each screen. The six boards come from six worlds in the audience's own culture, with the category's default page and its predictable opposite kept out. Colour strategy, light or dark by use scene, type floors and a list of faces generators reach for by habit are written down as rules (`references/09-design-craft.md`).
+- **A design scan in a real browser.** `check-app.mjs` measures what is actually painted: contrast behind real text, type hierarchy, line length and leading, text covered by something opaque, content that never revealed, buttons that wrap, a first screen below the fold, keyboard focus you cannot see, and the generator tells (nested cards, side stripes, glows, bounce easing, marquees, default faces, a cream ground). Findings are `major`, `minor` or `review`; a `review` item is kept only with a written reason. It found a real caption hidden under a photograph on a generated page that every earlier gate had passed.
+- **Named refinement passes.** Layout, typeset, colorize, bolder, quieter, distill, harden, animate, clarify, adapt and polish, each scoped, each ending in evidence, after a critique that judges the design first and reads the scan second.
+- **Copy that does not read generated.** A voice-from-facts method, slot rules for buttons, errors and empty states, and one shared list of generated-prose tells that the lint and the QA script both read.
+- **Research that listens.** Hearing the audience's worries and words without borrowing their claims, a measured teardown of up to three reference apps, and fonts with verified packages for 16 writing systems.
 - **Concepts, proofs and a binding baseline.** One structurally different concept per board, rendered as a real page, scored, chosen.
   The chosen picture becomes `DESIGN.md`, tokens, fonts and a contrast-checked palette that the build must match.
 - **A starter that fails the build on the usual mistakes.** Vite, React 19, TypeScript and Tailwind v4 with per-route prerender, 18 UI primitives,
@@ -93,7 +98,7 @@ The skill itself is plain Markdown. Its scripts need:
 | Script | Needs |
 |---|---|
 | `scripts/scaffold.sh` | Node 22.22 or newer and pnpm 10 |
-| `scripts/check-app.mjs` | `playwright` with a browser (`npx playwright install chromium`), or `--chrome /path/to/chrome` |
+| `scripts/check-app.mjs` | `playwright` or `playwright-core` with a browser (`npx playwright install chromium`), or `--chrome /path/to/chrome`. Flags: `--tour`, `--flows`, `--extremes` (320 and 1920 wide), `--facts` (numbers the brief does not contain), `--no-design` |
 | `scripts/optimize-images.mjs` | `sharp` (`pnpm add -D sharp`) |
 | `scripts/contrast.mjs` | Node only |
 
@@ -112,7 +117,17 @@ skills/ai-website-builder/
     06-qa-and-repair.md        what to measure, what to look at, how to repair
     07-failure-catalogue.md    failures seen in real builds, and the rule each one taught
     08-role-briefs.md          how to split the work between helpers
+    09-design-craft.md         visitor modes, worlds, colour and type floors, the tells as rules, the passes, scoring
+    10-copy-and-voice.md       voice from facts, slot rules, generated-prose tells
+    11-listening-to-the-audience.md   hearing worries and words without borrowing claims
+    12-diagrams.md             diagrams drawn in markup from tokens
+    13-reference-teardown.md   measuring reference apps into rules and trade-offs
+    14-scripts-and-app-jobs.md fonts per writing system, what visitors come for, accessibility additions
+    15-redesign-and-extension.md   an app already exists: depth, record, diff
+    NOTICE.md                  credits and licences
   scripts/                     scaffold, contrast, image optimiser, browser QA
+    lib/design-scan.mjs        the in-browser design scan and its rule map
+    lib/copy-tells.json        words, phrases and patterns that mark generated copy
   assets/
     template/                  the starter (Vite, React 19, Tailwind v4)
     app-starter/               accounts, database and seed data for working apps
@@ -125,6 +140,11 @@ skills/ai-website-builder/
 python3 tools/check_skill.py        # paths resolve, scripts parse, no credentials or personal paths
 python3 tools/package_skill.py      # rebuild dist/ai-website-builder.skill
 python3 tools/package_skill.py --check
+node tools/tests/design-scan.test.mjs   # needs playwright-core and a browser; a sloppy page must trip every rule, a clean one none
 ```
+
+## Credits
+
+The design-craft layer was written after reading several public projects on AI design, copy, research and diagrams. Their ideas shaped it and nothing was copied. The list and their licences are in [`NOTICE.md`](skills/ai-website-builder/references/NOTICE.md).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) and [CHANGELOG.md](CHANGELOG.md). Released under the [MIT License](LICENSE).

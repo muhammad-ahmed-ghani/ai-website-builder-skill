@@ -14,8 +14,8 @@ Time and cost, as measured on the system this method comes from: a full app is 2
 | 6 | Choose and bind the direction | `.app-notes/direction/DESIGN.md`, `src/styles/tokens.css`, `fonts.css` | One chosen board; tokens compile; every colour pair clears WCAG AA |
 | 7 | Plan | `.app-notes/plan.md` | Pages and sections each have a one-line job; features have executable acceptance steps; images planned with a job |
 | 8 | Build (PARALLEL by page) | the app | `pnpm lint` and `pnpm build` pass; no placeholder, no dead control |
-| 9 | Verify | `.app-notes/qa/` | Real browser, three sizes, evidence in hand (see 06) |
-| 10 | Repair | commits | Every open defect fixed at its cause or listed honestly |
+| 9 | Verify | `.app-notes/qa/` | Real browser, three sizes, the design scan read, evidence in hand (see 06) |
+| 10 | Critique and repair | commits, `.app-notes/critique.md` | The design judged unanchored first, then against the scan; each named pass (see 09) run scoped, ending in evidence; every open defect fixed at its cause or listed honestly |
 | 11 | Polish against the chosen picture | commits | The built home page is held beside the chosen board and the gaps are closed |
 | 12 | Report | final message | Only what was measured is claimed; unfinished work is named |
 

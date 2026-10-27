@@ -33,6 +33,8 @@ The token contract: `--color-*` (bg, surface, surface-2, fg, muted, line, accent
 
 ### Copy
 
+The method (voice from facts, slot rules, the scripted tell scan, the reader test) is `10-copy-and-voice.md`; the lint and the QA script share `copy-tells.json`. In short:
+
 Write like a person who knows this business. Lead with the specific outcome for the visitor; concrete nouns, numbers and details from the brief; short sentences; one idea per paragraph. Avoid weightless words (supercharge, seamless, unlock, elevate, revolutionize, next-generation, cutting-edge, game-changer, effortless, empower, streamline, leverage, harness, robust, holistic, "next level", "in today's fast-paced world"), "it's not X, it's Y", rule-of-three taglines ("Fast. Simple. Powerful."), and em-dash habits. Buttons name the result. Headline and subhead do not repeat each other. If a headline could sit on a competitor's app unchanged, rewrite it. Use the language and locale of the brief. The evidence rule and claims ledger in `01-read-the-request.md` apply to every sentence.
 
 ### Forms and actions that always work

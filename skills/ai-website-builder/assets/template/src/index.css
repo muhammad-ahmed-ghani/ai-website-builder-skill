@@ -41,6 +41,41 @@
     outline-offset: 2px;
   }
 
+  /* Parts the browser draws take the tokens too, so form controls, the caret and the scrollbar match the direction. */
+  html {
+    font-synthesis: none;
+    accent-color: var(--color-accent);
+    caret-color: var(--color-accent);
+    scrollbar-color: var(--color-muted) var(--color-bg);
+  }
+
+  /* Headings balance their lines; paragraphs avoid a one-word last line. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: balance;
+  }
+
+  p,
+  li,
+  blockquote,
+  figcaption {
+    text-wrap: pretty;
+  }
+
+  a {
+    text-underline-offset: 0.2em;
+  }
+
+  /* Figures that line up: tables by default, anything else with data-tabular. */
+  table,
+  [data-tabular] {
+    font-variant-numeric: tabular-nums;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
